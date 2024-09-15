@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación de Frutas y Verduras con IA y TensorFlow.js</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #666;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Clasificación de Frutas y Verduras con IA</h1>
+        <p>Sube una imagen de una fruta o verdura y la IA la clasificará</p>
+       
+        <input type="file" id="fruitImage" accept="image/*">
+        <button onclick="classifyFruit()">Clasificar</button>
+       
+        <div class="result" id="result"></div>
+        <div class="description" id="description"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+
+    <script>
+        let model;
+
+        async function loadModel() {
+            // Cargar el modelo preentrenado de MobileNet
+            model = await mobilenet.load();
+            console.log('Modelo cargado');
+        }
+
+        async function classifyFruit() {
+            var result = document.getElementById('result');
+            var description = document.getElementById('description');
+            var fruitImage = document.getElementById('fruitImage').files[0];
+
+            if (fruitImage) {
+                // Leer la imagen subida
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(fruitImage);
+                img.width = 224; // Requerido para MobileNet
+
+                // Mostrar "Clasificando..." mientras se procesa la imagen
+                result.textContent = "Clasificando...";
+                description.textContent = "";
+
+                // Esperar que la imagen se cargue antes de clasificar
+                img.onload = async function() {
+                    // Usar el modelo para predecir la imagen
+                    const predictions = await model.classify(img);
+
+                    // Filtrar los resultados para frutas y verduras
+                    const fruitAndVegNames = ["apple", "banana", "orange", "carrot", "broccoli", "cucumber"];
+                    const filteredPrediction = predictions.find(pred => {
+                        return fruitAndVegNames.some(item => pred.className.toLowerCase().includes(item));
+                    });
+
+                    if (filteredPrediction) {
+                        // Mostrar resultado en español
+                        if (filteredPrediction.className.includes("apple")) {
+                            result.textContent = "Esta fruta es: Manzana";
+                            description.textContent = "Las manzanas son frutas dulces producidas por el árbol de manzana (Malus domestica). Están llenas de nutrientes.";
+                        } else if (filteredPrediction.className.includes("banana")) {
+                            result.textContent = "Esta fruta es: Plátano";
+                            description.textContent = "Los plátanos son ricos en potasio y son una de las frutas más populares del mundo.";
+                        } else if (filteredPrediction.className.includes("orange")) {
+                            result.textContent = "Esta fruta es: Naranja";
+                            description.textContent = "Las naranjas son frutas cítricas conocidas por su alto contenido de vitamina C.";
+                        } else if (filteredPrediction.className.includes("carrot")) {
+                            result.textContent = "Esta verdura es: Zanahoria";
+                            description.textContent = "Las zanahorias son vegetales de raíz comestibles, ricos en beta caroteno, fibra y antioxidantes.";
+                        } else if (filteredPrediction.className.includes("broccoli")) {
+                            result.textContent = "Esta verdura es: Brócoli";
+                            description.textContent = "El brócoli es un vegetal crucífero rico en vitaminas, minerales y antioxidantes.";
+                        } else if (filteredPrediction.className.includes("cucumber")) {
+                            result.textContent = "Esta verdura es: Pepino";
+                            description.textContent = "Los pepinos son vegetales hidratantes, mayormente compuestos de agua y son ideales para ensaladas.";
+                        }
+                    } else {
+                        result.textContent = "La IA no pudo reconocer la fruta o verdura de la imagen.";
+                        description.textContent = "";
+                    }
+                };
+            } else {
+                result.textContent = "¡Por favor, sube una imagen primero!";
+                description.textContent = "";
+            }
+        }
+
+        // Cargar el modelo al iniciar la página
+        loadModel();
+    </script>
+
+</body>
+</html>
+
+
+
+
