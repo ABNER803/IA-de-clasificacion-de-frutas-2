@@ -12,43 +12,63 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #2C2C2C;
             margin: 0;
+            color: white;
         }
         .container {
-            background-color: white;
+            background-color: #3C3C3C;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             text-align: center;
             width: 400px;
+            max-width: 90%;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1em;
+            margin-bottom: 20px;
+            color: #B0B0B0;
         }
         input[type="file"] {
             display: block;
             margin: 20px auto;
+            background-color: #444;
+            border-radius: 10px;
+            padding: 5px;
+            color: #ddd;
         }
         button {
             padding: 10px 20px;
-            background-color: #28a745;
+            background-color: #3B82F6;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #2563EB;
         }
         .result {
             margin-top: 20px;
             font-size: 1.2em;
-            color: #333;
+            background-color: #444;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #E5E5E5;
         }
         .description {
             margin-top: 10px;
             font-size: 1em;
-            color: #666;
+            color: #CCCCCC;
             padding: 10px;
-            background-color: #f9f9f9;
+            background-color: #3C3C3C;
             border-radius: 5px;
         }
     </style>
@@ -71,9 +91,7 @@
 
     <script>
         let model;
-
         async function loadModel() {
-            // Cargar el modelo preentrenado de MobileNet
             model = await mobilenet.load();
             console.log('Modelo cargado');
         }
@@ -84,28 +102,21 @@
             var fruitImage = document.getElementById('fruitImage').files[0];
 
             if (fruitImage) {
-                // Leer la imagen subida
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(fruitImage);
-                img.width = 224; // Requerido para MobileNet
+                img.width = 224;
 
-                // Mostrar "Clasificando..." mientras se procesa la imagen
                 result.textContent = "Clasificando...";
                 description.textContent = "";
 
-                // Esperar que la imagen se cargue antes de clasificar
                 img.onload = async function() {
-                    // Usar el modelo para predecir la imagen
                     const predictions = await model.classify(img);
-
-                    // Filtrar los resultados para frutas y verduras
                     const fruitAndVegNames = ["apple", "banana", "orange", "carrot", "broccoli", "cucumber"];
                     const filteredPrediction = predictions.find(pred => {
                         return fruitAndVegNames.some(item => pred.className.toLowerCase().includes(item));
                     });
 
                     if (filteredPrediction) {
-                        // Mostrar resultado en español
                         if (filteredPrediction.className.includes("apple")) {
                             result.textContent = "Esta fruta es: Manzana";
                             description.textContent = "Las manzanas son frutas dulces producidas por el árbol de manzana (Malus domestica). Están llenas de nutrientes.";
@@ -135,14 +146,9 @@
                 description.textContent = "";
             }
         }
-
-        // Cargar el modelo al iniciar la página
-        loadModel();
+          loadModel();
     </script>
 
 </body>
 </html>
-
-
-
 
